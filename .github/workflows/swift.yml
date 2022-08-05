@@ -12,10 +12,14 @@ jobs:
   build:
     name: Build    
     runs-on: macos-latest
-    strategy:
-      matrix:
-        destination: ["platform=iOS Simulator,name=iPhone 11"]
     steps:
+    - name: Prepare iOS 14.4 simulator
+      run: |
+       sudo mkdir -p /Library/Developer/CoreSimulator/Profiles/Runtimes
+       sudo ln -s /Applications/Xcode_13.0.app/Contents/Developer/Platforms/iPhoneOS.platform/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS.simruntime /Library/Developer/CoreSimulator/Profiles/Runtimes/iOS\ 14.4.simruntime
+       xcrun simctl list runtimes
+       xcrun simctl create iPhone_12 "iPhone 12" "com.apple.CoreSimulator.SimRuntime.iOS-14-4"
+       xcrun simctl list devices 14.4
     - uses: actions/checkout@v2
     - uses: actions/cache@v1
       with:
@@ -31,4 +35,4 @@ jobs:
     - name: CocoaPod Install
       run: pod install
     - name: Build
-      run: xcodebuild -workspace RickAndMortyFinalApp.xcworkspace -scheme RickAndMortyFinalApp -configuration Release -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 11'        
+      run: xcodebuild -workspace RickAndMortyFinalApp.xcworkspace -scheme RickAndMortyFinalApp -configuration Release -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 12'        
