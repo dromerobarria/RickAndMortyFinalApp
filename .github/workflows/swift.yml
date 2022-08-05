@@ -12,6 +12,9 @@ jobs:
   build:
     name: Build    
     runs-on: macos-latest
+    strategy:
+      matrix:
+        destination: ["platform=iOS Simulator,name=iPhone 13"]
     steps:
     - uses: actions/checkout@v2
     - uses: actions/cache@v1
@@ -20,15 +23,8 @@ jobs:
         key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
         restore-keys: |
           ${{ runner.os }}-pods-
-    - name: Prepare iOS 12 simulator
-      run: |
-          sudo mkdir -p /Library/Developer/CoreSimulator/Profiles/Runtimes
-          sudo ln -s /Applications/Xcode_13.0.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/Library/CoreSimulator/Profiles/Runtimes/iOS.simruntime /Library/Developer/CoreSimulator/Profiles/Runtimes/iOS\ 12.4.simruntime
-          xcrun simctl list runtimes
-          xcrun simctl create custom-test-device "iPhone 11" "com.apple.CoreSimulator.SimRuntime.iOS-12-4"
-          xcrun simctl list devices 12.4
     - name: Force Xcode 13
-      run: sudo xcode-select -switch /Applications/Xcode_13.app
+      run: sudo xcode-select -switch /Applications/Xcode_13.0.app
     - uses: actions/setup-ruby@v1
       with:
         ruby-version: '2.6'
