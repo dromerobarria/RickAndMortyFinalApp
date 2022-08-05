@@ -28,14 +28,7 @@ jobs:
     - uses: actions/setup-ruby@v1
       with:
         ruby-version: '2.6'
-    - name: Dependencies
+    - name: CocoaPod Install
       run: pod install
-      env:
-        DEVELOPER_DIR: ${{ matrix.xcode }}
     - name: Build
-      run: |
-          xcodebuild clean build -workspace RickAndMortyFinalApp.xcworkspace -scheme RickAndMortyFinalApp -destination "${destination}" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO
-          xcrun simctl list
-      env: 
-         destination: ${{ matrix.destination }}
-        
+      run: xcodebuild -workspace RickAndMortyFinalApp.xcworkspace -scheme RickAndMortyFinalApp -configuration Release -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 11'        
