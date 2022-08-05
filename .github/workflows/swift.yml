@@ -28,15 +28,10 @@ jobs:
     - uses: actions/setup-ruby@v1
       with:
         ruby-version: '2.6'
-    - name: Install Cocoapods
-      run: gem install cocoapods
-    - name: Deploy to Cocoapods
-      run: |
-        set -eo pipefail
-        pod lib lint --allow-warnings
-        pod trunk push --allow-warnings
+    - name: Dependencies
+      run: bundle exec pod install
       env:
-        COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+        DEVELOPER_DIR: ${{ matrix.xcode }}
     - name: Build
       run: |
           xcodebuild clean build -workspace RickAndMortyFinalApp.xcworkspace -scheme RickAndMortyFinalApp -destination "${destination}" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO
