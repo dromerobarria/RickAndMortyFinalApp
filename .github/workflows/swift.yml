@@ -17,6 +17,13 @@ jobs:
       matrix:
         destination: ['platform=iOS Simulator,name=iPhone 11']#
     steps:
+     - name: Prepare iOS 12 simulator
+       run: |
+          sudo mkdir -p /Library/Developer/CoreSimulator/Profiles/Runtimes
+          sudo ln -s /Applications/Xcode_13.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/Library/CoreSimulator/Profiles/Runtimes/iOS.simruntime /Library/Developer/CoreSimulator/Profiles/Runtimes/iOS\ 12.4.simruntime
+          xcrun simctl list runtimes
+          xcrun simctl create custom-test-device "iPhone 11" "com.apple.CoreSimulator.SimRuntime.iOS-12-4"
+          xcrun simctl list devices 12.4
      - name: Force Xcode 13
        run: sudo xcode-select -switch /Applications/Xcode_13.app
      - name: Checkout
