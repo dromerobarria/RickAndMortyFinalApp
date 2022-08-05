@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
     
 env:
-  DEVELOPER_DIR: /Applications/Xcode_12.app/Contents/Developer
+  DEVELOPER_DIR: /Applications/Xcode_13.0.app/Contents/Developer
 jobs:
   build:
     name: Build    
@@ -24,15 +24,23 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pods-
     - name: Force Xcode 13
-      run: sudo xcode-select -switch /Applications/Xcode_12.app
+      run: sudo xcode-select -switch /Applications/Xcode_13.app
     - uses: actions/setup-ruby@v1
       with:
         ruby-version: '2.6'
-    - name: Install Dependencies
+    - name: Install Cocoapods
+      run: gem install cocoapods
+    - name: Deploy to Cocoapods
       run: |
-        pod install --repo-update
-      shell: bash
-    - uses: ty0x2333/cocoapods-action@master
-      with:
-        additional_build_params: -destination 'platform=iOS Simulator,name=iPhone 11,OS=13.0'
-        workspace: 'RickAndMortyFinalApp'
+        set -eo pipefail
+        pod lib lint --allow-warnings
+        pod trunk push --allow-warnings
+      env:
+        COCOAPODS_TRUNK_TOKEN: ${{ secrets.COCOAPODS_TRUNK_TOKEN }}
+    - name: Build
+      run: |
+          xcodebuild clean build -workspace RickAndMortyFinalApp.xcworkspace -scheme RickAndMortyFinalApp -destination "${destination}" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO
+          xcrun simctl list
+      env: 
+         destination: ${{ matrix.destination }}
+        
