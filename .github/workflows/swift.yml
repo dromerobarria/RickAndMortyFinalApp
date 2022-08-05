@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
     
 env:
-  DEVELOPER_DIR: /Applications/Xcode_12.0.app/Contents/Developer
+  DEVELOPER_DIR: /Applications/Xcode_12.app/Contents/Developer
 jobs:
   build:
     name: Build    
@@ -24,7 +24,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pods-
     - name: Force Xcode 13
-      run: sudo xcode-select -switch /Applications/Xcode_12.0.app
+      run: sudo xcode-select -switch /Applications/Xcode_12.app
     - uses: actions/setup-ruby@v1
       with:
         ruby-version: '2.6'
