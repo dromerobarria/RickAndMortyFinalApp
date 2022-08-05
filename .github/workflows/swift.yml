@@ -5,42 +5,40 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
+    
+env:
+  DEVELOPER_DIR: /Applications/Xcode_13.app/Contents/Developer
+  
 jobs:
-  test:
-    name: Test
+  build:
+    name: Build    
     runs-on: macos-latest
-    env: 
-      DEVELOPER_DIR: /Applications/Xcode_13.app/Contents/Developer
-      MINT_PATH: ${{ github.workspace }}/mint
-    strategy:
-      matrix:
-        destination: ['platform=iOS Simulator,name=iPhone 11']#
     steps:
-     - name: Prepare iOS 12 simulator
-       run: |
+    - uses: actions/checkout@v2
+    - uses: actions/cache@v1
+      with:
+        path: Pods
+        key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-pods-
+    - name: Prepare iOS 12 simulator
+      run: |
           sudo mkdir -p /Library/Developer/CoreSimulator/Profiles/Runtimes
           sudo ln -s /Applications/Xcode_13.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/Library/CoreSimulator/Profiles/Runtimes/iOS.simruntime /Library/Developer/CoreSimulator/Profiles/Runtimes/iOS\ 12.4.simruntime
           xcrun simctl list runtimes
           xcrun simctl create custom-test-device "iPhone 11" "com.apple.CoreSimulator.SimRuntime.iOS-12-4"
           xcrun simctl list devices 12.4
-     - name: Force Xcode 13
-       run: sudo xcode-select -switch /Applications/Xcode_13.app
-     - name: Checkout
-       uses: actions/checkout@main
-     - uses: actions/setup-ruby@v1
-       with:
+    - name: Force Xcode 13
+      run: sudo xcode-select -switch /Applications/Xcode_13.app
+    - uses: actions/setup-ruby@v1
+      with:
         ruby-version: '2.6'
-     - name: Install pods
-       run: pod install --repo-update
-     - name: Build
-       run: |
+    - name: Install pods
+      run: pod install --repo-update
+    - name: Build
+      run: |
           xcodebuild clean build -workspace RickAndMortyFinalApp.xcworkspace -scheme RickAndMortyFinalApp -destination "${destination}" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO
           xcrun simctl list
-       env: 
-         destination: ${{ matrix.destination }}
-     - name: Test
-       run: |
+    - name: Test
+      run: |
           xcodebuild clean test -workspace RickAndMortyFinalApp.xcworkspace -scheme RickAndMortyFinalApp -destination "${destination}" CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO ONLY_ACTIVE_ARCH=NO
-       env: 
-         destination: ${{ matrix.destination }}
