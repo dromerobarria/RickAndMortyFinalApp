@@ -32,7 +32,14 @@ jobs:
     - uses: actions/setup-ruby@v1
       with:
         ruby-version: '2.6'
-    - name: CocoaPod Install
+    - name: Install Cocoapods
+      run: gem install cocoapods
+    - name: Install pods to prepare workspace
       run: pod install
-    - name: Build
-      run: xcodebuild -workspace RickAndMortyFinalApp.xcworkspace -scheme RickAndMortyFinalApp -configuration Release -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 12'        
+    - name: Show Build Settings
+      run: xcodebuild -workspace RickAndMortyFinalApp.xcworkspace -scheme RickAndMortyFinalApp -showBuildSettings
+    - name: Show Available Destinations
+      run: xcodebuild -workspace RickAndMortyFinalApp.xcworkspace -scheme RickAndMortyFinalApp -showdestinations
+    - name: clean and build
+      run: xcodebuild clean build -workspace RickAndMortyFinalApp.xcworkspace -scheme RickAndMortyFinalApp -destination 'platform=iOS Simulator,OS=15.0,name=iPhone 12' -showBuildTimingSummary
+    
